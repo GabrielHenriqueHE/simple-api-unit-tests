@@ -7,14 +7,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -27,6 +28,9 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Captor
+    private ArgumentCaptor<User> userArgumentCaptor;
 
     @Nested
     class CreateUser {
@@ -45,7 +49,7 @@ class UserServiceTest {
                  Instant.now()
             );
             // Retorna uma instância de User quando save for invocado.
-            doReturn(user).when(userRepository).save(any());
+            doReturn(user).when(userRepository).save(userArgumentCaptor.capture());
 
             var input = new CreateUserDTO(
                     "gabriel",
@@ -60,6 +64,12 @@ class UserServiceTest {
             // Assert
             // Certifica que a saída gerada por createUser não é nula.
             assertNotNull(output);
+
+            var userCaptured = userArgumentCaptor.getValue();
+
+            assertEquals(input.username(), userCaptured.getUsername());
+            assertEquals(input.email(), userCaptured.getEmail());
+            assertEquals(input.password(), userCaptured.getPassword());
         }
 
         @Test
@@ -79,6 +89,7 @@ class UserServiceTest {
             // Certifica que a exceção será lançada quando createUser invocar o save.
             assertThrows(RuntimeException.class, () -> userService.createUser(input));
         }
+
     }
 
 }
