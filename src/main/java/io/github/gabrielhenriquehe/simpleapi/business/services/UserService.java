@@ -33,6 +33,18 @@ public class UserService {
         return rawUsers.stream().map(UserMapper::entityToDTO).toList();
     }
 
+    public UserDTO findUserById(Long id) {
+        var optionalUser = this.userRepository.findById(id);
+
+        if (optionalUser.isEmpty()) {
+            throw new ResourceNotFoundException("User not found from ID:".concat(String.valueOf(id)));
+        }
+
+        User user = optionalUser.get();
+
+        return UserMapper.entityToDTO(user);
+    }
+
     public UserDTO updateUser(Long userId, UpdateUserDTO dto) {
 
         var optionalUser = this.userRepository.findById(userId);

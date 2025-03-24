@@ -45,6 +45,19 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<AppResponse<UserDTO>> findUserById(@PathVariable("userId") Long userId) {
+        var user = this.userService.findUserById(userId);
+
+        AppResponse<UserDTO> response = new AppResponse<>(
+                null,
+                HttpStatus.OK.value(),
+                user
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PutMapping("/{userId}")
     public ResponseEntity<AppResponse<UserDTO>> updateUser(@PathVariable("userId") Long userId,
                                                            @RequestBody UpdateUserDTO dto){
